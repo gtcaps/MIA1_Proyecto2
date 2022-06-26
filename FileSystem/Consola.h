@@ -13,6 +13,7 @@
 
 #include "Mkdisk.h"
 #include "Rmdisk.h"
+#include "Fdisk.h"
 
 using namespace std;
 
@@ -324,13 +325,13 @@ bool Consola::fdisk(string comando) {
 
     bool validPath = validatePathOrActivateRAID(path);
     if (!validPath) {
-        cout << endl << " *** El path indicado no existe *** " << endl;
+        cout << endl << " *** Error, El path indicado no existe *** " << endl;
         return false;
     }
 
-    //Fdisk fdisk;
-    //return fdisk.administrarParticion(size, path, name, unit, type, fit, del, add, mov);
-    return false;
+    Fdisk fdisk;
+    return fdisk.administrarParticion(size, path, name, unit, type, fit, del, add, mov);
+
 }
 
 //bool Consola::mount(string comando)  {
