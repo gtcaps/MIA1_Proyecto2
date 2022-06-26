@@ -12,6 +12,7 @@
 //#include "Mount.h"
 
 #include "Mkdisk.h"
+#include "Rmdisk.h"
 
 using namespace std;
 
@@ -92,7 +93,7 @@ bool Consola::ejecutarComando(string comando) {
 
     // RMDISK ================
     if (lcomando.starts_with("rmdisk")) {
-        //return rmdisk(lcomando);
+        return rmdisk(lcomando);
     }
 
     // FDISK ================
@@ -218,29 +219,29 @@ bool Consola::mkdisk(string comando) {
     return mkdisk.crearDisco(size, path, name);
 }
 
-//bool Consola::rmdisk(string comando) {
-//
-//    vector<string> v = getAtributtes(comando);
-//    string path = "";
-//
-//    for (auto it: v) {
-//        vector<string> s = split(it);
-//
-//        if (s.at(0) == "path") {
-//            path = s.at(1);
-//        }
-//    }
-//
-//    if (path.empty() ) {
-//        cout << endl << " *** Parametros obligatorios: path *** " << endl << endl;
-//        return false;
-//    }
-//
-//    Rmdisk rmdisk;
-//    return rmdisk.eliminarDisco(path);
-//
-//}
-//
+bool Consola::rmdisk(string comando) {
+
+    vector<string> v = getAtributtes(comando);
+    string path = "";
+
+    for (auto it: v) {
+        vector<string> s = split(it);
+
+        if (s.at(0) == "path") {
+            path = s.at(1);
+        }
+    }
+
+    if (path.empty() ) {
+        cout << endl << " *** Parametros obligatorios: path *** " << endl << endl;
+        return false;
+    }
+
+    Rmdisk rmdisk;
+    return rmdisk.eliminarDisco(path);
+
+}
+
 //bool Consola::fdisk(string comando) {
 //
 //    vector<string> v = getAtributtes(comando);
