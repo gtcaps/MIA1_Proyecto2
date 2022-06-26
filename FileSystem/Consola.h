@@ -49,7 +49,7 @@ private:
 
     string getPathofDiskPath(string diskPath);
 
-    string getPathDiskOrPathRaidDisk(string diskPath);
+    bool validatePathOrActivateRAID(string diskPath);
 
 };
 
@@ -322,8 +322,11 @@ bool Consola::fdisk(string comando) {
         fit = "wf";
     }
 
-    getDiskNameofPath(path);
-    getPathofDiskPath(path);
+    bool validPath = validatePathOrActivateRAID(path);
+    if (!validPath) {
+        cout << endl << " *** El path indicado no existe *** " << endl;
+        return false;
+    }
 
     //Fdisk fdisk;
     //return fdisk.administrarParticion(size, path, name, unit, type, fit, del, add, mov);
@@ -660,6 +663,39 @@ string Consola::getPathofDiskPath(string diskPath) {
     string path = diskPath.substr(0,lastIndex + 1);
 
     return path;
+}
+
+bool Consola::validatePathOrActivateRAID(string diskPath) {
+
+    // Validar si existe el path
+    FILE* disco = fopen(diskPath.c_str(), "rb+");
+
+    // Si el path existe, no hacemos nada
+    if (disco != NULL) {
+        return true;
+    }
+
+    // Si el path no existe, vamos a validar si existe una copia RAID
+    string path = getPathofDiskPath(diskPath);
+    string name = getDiskNameofPath(diskPath);
+    string raidDiskPath =  path + "raid_" + name ;
+
+    FILE* discoRaid  = fopen(raidDiskPath.c_str(), "rb+");
+
+    // Si no existe el disco raid se devuelve false
+    if (discoRaid == NULL) {
+        return false;
+    }
+    fclose(discoRaid);
+
+    // Si existe el disco raid, se procede a activar creando una copia
+    cout << endl << "*** activando raid 1 ***" << endl << endl;
+
+    string comando = "cp \"" + path + "raid_" + name + "\" \"" + path + name + "\"";
+    system(comando.c_str());
+
+    return true;
+
 }
 
 #endif //FILESYSTEM_CONSOLA_H
