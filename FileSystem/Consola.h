@@ -92,42 +92,42 @@ bool Consola::ejecutarComando(string comando) {
 
     // RMDISK ================
     if (lcomando.starts_with("rmdisk")) {
-        return rmdisk(lcomando);
+        //return rmdisk(lcomando);
     }
 
     // FDISK ================
     if (lcomando.starts_with("fdisk")) {
-        return fdisk(lcomando);
+        //return fdisk(lcomando);
     }
 
     // MOUNT ================
     if (lcomando.starts_with("mount")) {
-        return mount(lcomando);
+        //return mount(lcomando);
     }
 
     // UNMOUNT ================
     if (lcomando.starts_with("unmount")) {
-        return unmount(lcomando);
+        //return unmount(lcomando);
     }
 
     // EXEC ================
     if (lcomando.starts_with("exec")) {
-        return exec(comando);
+        //return exec(comando);
     }
 
     // REP ================
     if (lcomando.starts_with("rep")) {
-        return rep(lcomando);
+        //return rep(lcomando);
     }
 
     // MKFS ================
     if (lcomando.starts_with("mkfs")) {
-        return mkfs(lcomando);
+        //return mkfs(lcomando);
     }
 
     // MKFILE ================
     if (lcomando.starts_with("mkfile")) {
-        return mkfile(lcomando);
+        //return mkfile(lcomando);
     }
 
     cout << "comando: invalido" << endl;

@@ -1,4 +1,5 @@
 #include <iostream>
+#include "Consola.h"
 
 int main() {
     // Crear Disco
@@ -9,6 +10,9 @@ int main() {
     // Crear Carpeta (mkdir)
     // Crear Archivo (mkfile)
     // Grafico del arbol;
-    std::cout << "Hello, World!" << std::endl;
+
+    Consola consola;
+    consola.ejecutar();
+
     return 0;
 }
