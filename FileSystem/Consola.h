@@ -45,6 +45,12 @@ private:
 
     bool isNumber(string text);
 
+    string getDiskNameofPath(string diskPath);
+
+    string getPathofDiskPath(string diskPath);
+
+    string getPathDiskOrPathRaidDisk(string diskPath);
+
 };
 
 // IMPLEMENTACIONES DE LOS METODOS
@@ -98,7 +104,7 @@ bool Consola::ejecutarComando(string comando) {
 
     // FDISK ================
     if (lcomando.starts_with("fdisk")) {
-        //return fdisk(lcomando);
+        return fdisk(lcomando);
     }
 
     // MOUNT ================
@@ -242,85 +248,88 @@ bool Consola::rmdisk(string comando) {
 
 }
 
-//bool Consola::fdisk(string comando) {
-//
-//    vector<string> v = getAtributtes(comando);
-//    int size = 0;
-//    string path = "", name = "", unit = "", type = "", fit = "", del = "", add = "", mov = "";
-//
-//    for (auto it: v) {
-//        vector<string> s = split(it);
-//
-//        if (s.at(0) == "size") {
-//            if (!isNumber(s.at(1)) || s.at(1) == "0") {
-//                cout << endl << " *** El size debe de ser un numero mayor a 0 ***" << endl << endl;
-//                return false;
-//            }
-//
-//            size = stoi(s.at(1));
-//            continue;
-//        }
-//
-//        if (s.at(0) == "path") {
-//            path = s.at(1);
-//            continue;
-//        }
-//
-//        if (s.at(0) == "name") {
-//            name = s.at(1);
-//            continue;
-//        }
-//
-//        if (s.at(0) == "unit") {
-//            unit = s.at(1);
-//            continue;
-//        }
-//
-//        if (s.at(0) == "type") {
-//            type = s.at(1);
-//            continue;
-//        }
-//
-//        if (s.at(0) == "fit") {
-//            fit = s.at(1);
-//            continue;
-//        }
-//
-//        if (s.at(0) == "delete") {
-//            del = s.at(1);
-//            continue;
-//        }
-//
-//        if (s.at(0) == "add") {
-//            add = s.at(1);
-//            continue;
-//        }
-//
-//        if (s.at(0) == "mov") {
-//            mov = s.at(1);
-//            continue;
-//        }
-//    }
-//
-//
-//    // Unidades
-//    if (unit == "") {
-//        unit  = "k";
-//    }
-//
-//    if (type == "") {
-//        type = "p";
-//    }
-//
-//    if (fit == "") {
-//        fit = "wf";
-//    }
-//
-//    Fdisk fdisk;
-//    return fdisk.administrarParticion(size, path, name, unit, type, fit, del, add, mov);
-//
-//}
-//
+bool Consola::fdisk(string comando) {
+
+    vector<string> v = getAtributtes(comando);
+    int size = 0;
+    string path = "", name = "", unit = "", type = "", fit = "", del = "", add = "", mov = "";
+
+    for (auto it: v) {
+        vector<string> s = split(it);
+
+        if (s.at(0) == "size") {
+            if (!isNumber(s.at(1)) || s.at(1) == "0") {
+                cout << endl << " *** El size debe de ser un numero mayor a 0 ***" << endl << endl;
+                return false;
+            }
+
+            size = stoi(s.at(1));
+            continue;
+        }
+
+        if (s.at(0) == "path") {
+            path = s.at(1);
+            continue;
+        }
+
+        if (s.at(0) == "name") {
+            name = s.at(1);
+            continue;
+        }
+
+        if (s.at(0) == "unit") {
+            unit = s.at(1);
+            continue;
+        }
+
+        if (s.at(0) == "type") {
+            type = s.at(1);
+            continue;
+        }
+
+        if (s.at(0) == "fit") {
+            fit = s.at(1);
+            continue;
+        }
+
+        if (s.at(0) == "delete") {
+            del = s.at(1);
+            continue;
+        }
+
+        if (s.at(0) == "add") {
+            add = s.at(1);
+            continue;
+        }
+
+        if (s.at(0) == "mov") {
+            mov = s.at(1);
+            continue;
+        }
+    }
+
+
+    // Unidades
+    if (unit == "") {
+        unit  = "k";
+    }
+
+    if (type == "") {
+        type = "p";
+    }
+
+    if (fit == "") {
+        fit = "wf";
+    }
+
+    getDiskNameofPath(path);
+    getPathofDiskPath(path);
+
+    //Fdisk fdisk;
+    //return fdisk.administrarParticion(size, path, name, unit, type, fit, del, add, mov);
+    return false;
+}
+
 //bool Consola::mount(string comando)  {
 //
 //    vector<string> v = getAtributtes(comando);
@@ -615,6 +624,42 @@ bool Consola::isNumber(string text) {
     }
 
     return true;
+}
+
+string Consola::getDiskNameofPath(string diskPath) {
+    char c;
+    size_t lastIndex = 0;
+    int length = diskPath.length();
+
+    for (int i = length - 1; i >= 0; i--) {
+        c = diskPath[i];
+        if (c == '/') {
+            lastIndex = i;
+            break;
+        }
+    }
+
+    string name = diskPath.substr(lastIndex + 1);
+
+    return name;
+}
+
+string Consola::getPathofDiskPath(string diskPath) {
+    char c;
+    size_t lastIndex = 0;
+    int length = diskPath.length();
+
+    for (int i = length - 1; i >= 0; i--) {
+        c = diskPath[i];
+        if (c == '/') {
+            lastIndex = i;
+            break;
+        }
+    }
+
+    string path = diskPath.substr(0,lastIndex + 1);
+
+    return path;
 }
 
 #endif //FILESYSTEM_CONSOLA_H

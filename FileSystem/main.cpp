@@ -2,8 +2,8 @@
 #include "Consola.h"
 
 int main() {
-    // Crear Disco
-    // Crear RAID
+    // Crear Disco -----
+    // Crear RAID ------
     // Crear Particion (Primaria / Logica)
     // Mount
     // Mkfs
