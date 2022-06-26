@@ -3,4 +3,4 @@ project(FileSystem)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(FileSystem main.cpp Consola.h Mkdisk.h Structs.h Rmdisk.h)
+add_executable(FileSystem main.cpp Consola.h Mkdisk.h Structs.h Rmdisk.h Fdisk.h Mount.cpp Mount.h)

@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
-//#include "Mount.h"
+#include "Mount.h"
 
 #include "Mkdisk.h"
 #include "Rmdisk.h"
@@ -23,7 +23,7 @@ public:
     void ejecutar();
 private:
     bool ejecutarComando(string comando);
-    //Mount montaje;
+    Mount montaje;
 
     // comandos
     bool mkdisk(string comando);
@@ -110,12 +110,12 @@ bool Consola::ejecutarComando(string comando) {
 
     // MOUNT ================
     if (lcomando.starts_with("mount")) {
-        //return mount(lcomando);
+        return mount(lcomando);
     }
 
     // UNMOUNT ================
     if (lcomando.starts_with("unmount")) {
-        //return unmount(lcomando);
+        return unmount(lcomando);
     }
 
     // EXEC ================
@@ -334,69 +334,74 @@ bool Consola::fdisk(string comando) {
 
 }
 
-//bool Consola::mount(string comando)  {
-//
-//    vector<string> v = getAtributtes(comando);
-//    string path = "", name = "";
-//
-//    // Si no trae parametros, mostrar el listado de particiones
-//    if (v.size() == 0)  {
-//        montaje.leerMontaje();
-//        return true;
-//    }
-//
-//    for (auto it: v) {
-//        vector<string> s = split(it);
-//
-//        if (s.at(0) == "path") {
-//            path = s.at(1);
-//        }
-//
-//        if (s.at(0) == "name") {
-//            name = s.at(1);
-//        }
-//    }
-//
-//
-//
-//    if (path.empty() || name.empty()) {
-//        cout << endl << " *** Parametros obligatorios: path, name *** " << endl << endl;
-//        return false;
-//    }
-//
-//    return montaje.montarParticion(path, name);
-//
-//}
-//
-//bool Consola::unmount(string comando)   {
-//
-//    vector<string> v = getAtributtes(comando);
-//    vector<string> ids;
-//
-//    for (auto it: v) {
-//        vector<string> s = split(it);
-//
-//        if (s.at(0).starts_with("id")) {
-//            ids.insert(ids.end(), s.at(1));
-//        }
-//
-//    }
-//
-//    if (ids.empty()) {
-//        cout << endl << " *** Parametros obligatorios: id *** " << endl << endl;
-//        return false;
-//    }
-//
-//    for (string id: ids) {
-//        //cout << endl << " *** Desmontando " << id << " ***" << endl;
-//        montaje.desmontarParticion(id);
-//    }
-//
-//    return true;
-//
-//
-//}
-//
+bool Consola::mount(string comando)  {
+
+    vector<string> v = getAtributtes(comando);
+    string path = "", name = "";
+
+    // Si no trae parametros, mostrar el listado de particiones
+    if (v.size() == 0)  {
+        montaje.leerMontaje();
+        return true;
+    }
+
+    for (auto it: v) {
+        vector<string> s = split(it);
+
+        if (s.at(0) == "path") {
+            path = s.at(1);
+        }
+
+        if (s.at(0) == "name") {
+            name = s.at(1);
+        }
+    }
+
+
+    if (path.empty() || name.empty()) {
+        cout << endl << " *** Parametros obligatorios: path, name *** " << endl << endl;
+        return false;
+    }
+
+    bool validPath = validatePathOrActivateRAID(path);
+    if (!validPath) {
+        cout << endl << " *** Error, El path indicado no existe *** " << endl;
+        return false;
+    }
+
+    return montaje.montarParticion(path, name);
+
+}
+
+bool Consola::unmount(string comando)   {
+
+    vector<string> v = getAtributtes(comando);
+    vector<string> ids;
+
+    for (auto it: v) {
+        vector<string> s = split(it);
+
+        if (s.at(0).starts_with("id")) {
+            ids.insert(ids.end(), s.at(1));
+        }
+
+    }
+
+    if (ids.empty()) {
+        cout << endl << " *** Parametros obligatorios: id *** " << endl << endl;
+        return false;
+    }
+
+    for (string id: ids) {
+        //cout << endl << " *** Desmontando " << id << " ***" << endl;
+        montaje.desmontarParticion(id);
+    }
+
+    return true;
+
+
+}
+
 //bool Consola::rep(string comando)   {
 //
 //    vector<string> v = getAtributtes(comando);
