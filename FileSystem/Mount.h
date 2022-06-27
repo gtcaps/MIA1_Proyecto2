@@ -29,6 +29,8 @@ public:
     bool montarParticion(string path, string name);
     void leerMontaje();
     bool desmontarParticion(string id);
+
+    bool partitionIsMounted(string id);
 };
 
 

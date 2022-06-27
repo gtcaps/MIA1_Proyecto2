@@ -1,0 +1,12 @@
+mouNt $name=>"PRI 3"  $path=>"/home/archivos/proyecto2/D3.dsk"
+moUnt $PAth=>"/home/archivos/proyecto2/D1.dsk" $name=>"PRI 3"
+mOunt $name=>"PRI 2" $path=>"/home/archivos/proyecto2/D3.dsk"
+mouNt $path=>"/home/archivos/proyecto2/D1.dsk" $name=>"PRI 2"
+
+pause
+
+mkfs $id=>vda2 @type=>Full
+
+pause
+
+mkfile $id=>vda2 $path=>"/home/user/mia/fase1/fase1.txt" $size=>18175

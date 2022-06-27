@@ -14,6 +14,8 @@
 #include "Mkdisk.h"
 #include "Rmdisk.h"
 #include "Fdisk.h"
+#include "Mkfs.h"
+#include "FileSystem.h"
 
 using namespace std;
 
@@ -24,6 +26,7 @@ public:
 private:
     bool ejecutarComando(string comando);
     Mount montaje;
+    vector<FileSystem*> mountedFileSystems;
 
     // comandos
     bool mkdisk(string comando);
@@ -51,6 +54,8 @@ private:
     string getPathofDiskPath(string diskPath);
 
     bool validatePathOrActivateRAID(string diskPath);
+
+    bool existsIdFileSystem (string id);
 
 };
 
@@ -120,7 +125,7 @@ bool Consola::ejecutarComando(string comando) {
 
     // EXEC ================
     if (lcomando.starts_with("exec")) {
-        //return exec(comando);
+        return exec(comando);
     }
 
     // REP ================
@@ -130,12 +135,17 @@ bool Consola::ejecutarComando(string comando) {
 
     // MKFS ================
     if (lcomando.starts_with("mkfs")) {
-        //return mkfs(lcomando);
+        return mkfs(lcomando);
     }
 
     // MKFILE ================
     if (lcomando.starts_with("mkfile")) {
-        //return mkfile(lcomando);
+        return mkfile(lcomando);
+    }
+
+    // MKDIR ================
+    if (lcomando.starts_with("mkdir")) {
+        return mkdir(lcomando);
     }
 
     cout << "comando: invalido" << endl;
@@ -438,105 +448,205 @@ bool Consola::unmount(string comando)   {
 //
 //}
 //
-//bool Consola::mkfs(string comando)   {
-//
-//    vector<string> v = getAtributtes(comando);
-//    string id = "", type = "", add = "0", unit = "";
-//
-//    for (auto it: v) {
-//        vector<string> s = split(it);
-//
-//        if (s.at(0).starts_with("id")) {
-//            id = s.at(1);
-//        }
-//
-//        if (s.at(0).starts_with("type")) {
-//            type = s.at(1);
-//        }
-//
-//        if (s.at(0).starts_with("add")) {
-//            add = s.at(1);
-//        }
-//
-//        if (s.at(0).starts_with("unit")) {
-//            unit = s.at(1);
-//        }
-//    }
-//
-//    if (id.empty()) {
-//        cout << endl << " *** Parametros obligatorios: id *** " << endl << endl;
-//        return false;
-//    }
-//
-//    if (type.empty()) {
-//        type = "full";
-//    }
-//
-//    int addInt = 0;
-//    if (isNumber(add)) {
-//        addInt = stoi(add);
-//    } else {
-//        cout << endl << " *** El parametro add debe ser un numero *** " << endl << endl;
-//        return false;
-//    }
-//
-//    if (unit.empty()) {
-//        unit = "k";
-//    }
-//
-//    Mkfs mkfs;
-//    return mkfs.formatearFS(id, type, addInt, unit, montaje);
-//
-//}
-//
-//bool Consola::mkfile(string comando)   {
-//
-//    vector<string> v = getAtributtes(comando);
-//    string id = "", path = "", p = "", size = "0", cont = "";
-//
-//    for (auto it: v) {
-//        vector<string> s = split(it);
-//
-//        cout << it << endl;
-//
-//        if (s.at(0).starts_with("id")) {
-//            id = s.at(1);
-//        }
-//
-//        if (s.at(0).starts_with("path")) {
-//            path = s.at(1);
-//        }
-//
-//        if (s.at(0).starts_with("p")) {
-//            p = s.at(1);
-//        }
-//
-//        if (s.at(0).starts_with("size")) {
-//            size = s.at(1);
-//        }
-//
-//        if (s.at(0).starts_with("cont")) {
-//            cont = s.at(1);
-//        }
-//    }
-//
-//    if (id.empty() || path.empty()) {
-//        cout << endl << " *** Parametros obligatorios: id, path *** " << endl << endl;
-//        return false;
-//    }
-//
-//    if (isNumber(size) && stoi(size) < 0) {
-//        cout << endl << " *** Size no puede ser negativo *** " << endl << endl;
-//        return false;
-//    }
-//
-//
-//
-//
-//
-//    return false;
-//
-//}
+bool Consola::mkfs(string comando)   {
+
+    vector<string> v = getAtributtes(comando);
+    string id = "", type = "", add = "0", unit = "";
+
+    for (auto it: v) {
+        vector<string> s = split(it);
+
+        if (s.at(0).starts_with("id")) {
+            id = s.at(1);
+        }
+
+        if (s.at(0).starts_with("type")) {
+            type = s.at(1);
+        }
+
+        if (s.at(0).starts_with("add")) {
+            add = s.at(1);
+        }
+
+        if (s.at(0).starts_with("unit")) {
+            unit = s.at(1);
+        }
+    }
+
+    if (id.empty()) {
+        cout << endl << " *** Parametros obligatorios: id *** " << endl << endl;
+        return false;
+    }
+
+    if (type.empty()) {
+        type = "full";
+    }
+
+    int addInt = 0;
+    if (isNumber(add)) {
+        addInt = stoi(add);
+    } else {
+        cout << endl << " *** El parametro add debe ser un numero *** " << endl << endl;
+        return false;
+    }
+
+    if (unit.empty()) {
+        unit = "k";
+    }
+
+    //Mkfs mkfs;
+    //mkfs.formatearFS(id, type, addInt, unit, montaje);
+
+    // Validar que la particion con el id este montada
+    bool isMounted = montaje.partitionIsMounted(id);
+    if (!isMounted) {
+        cout << " *** Error, La particion debe de estar montada *** " << endl << endl;
+        return false;
+    }
+
+    // Crear el file system para la particion con el id
+    bool existsFS = existsIdFileSystem(id);
+    if (existsFS) {
+        cout << endl << " *** la particion " << id << " ya se encuentra formateada ***" << endl << endl;
+        return false;
+    }
+
+    FileSystem* fs = new FileSystem();
+    fs->id = id;
+    mountedFileSystems.insert(mountedFileSystems.end(), fs);
+
+    cout << " *** Formateo Completado " << id << endl << endl;
+    return true;
+
+}
+
+bool Consola::mkfile(string comando)   {
+
+    vector<string> v = getAtributtes(comando);
+    string id = "", path = "", p = "", cont = "";
+    int size = 0;
+
+    for (auto it: v) {
+        vector<string> s = split(it);
+
+        if (s.at(0).starts_with("id")) {
+            id = s.at(1);
+        }
+
+        if (s.at(0).starts_with("path")) {
+            path = s.at(1);
+        }
+
+        if (s.at(0) == "p") {
+            p = s.at(1);
+        }
+
+        if (s.at(0).starts_with("size")) {
+            if (!isNumber(s.at(1))) {
+                cout << endl << " *** El size debe de ser un numero  ***" << endl << endl;
+                return false;
+            }
+
+            size = stoi(s.at(1));
+        }
+
+        if (s.at(0).starts_with("cont")) {
+            cont = s.at(1);
+        }
+    }
+
+    if (id.empty() || path.empty()) {
+        cout << endl << " *** Parametros obligatorios: id, path *** " << endl << endl;
+        return false;
+    }
+
+
+    // Validar que la particion con el id este montada
+    bool isMounted = montaje.partitionIsMounted(id);
+    if (!isMounted) {
+        cout << " *** Error, La particion debe de estar montada *** " << endl << endl;
+        return false;
+    }
+
+    // Validar que existe el file system para el id
+    bool existsFS = existsIdFileSystem(id);
+    if (!existsFS) {
+        cout << endl << " *** Error, el id no cuenta con un sistema de archivos, utilice mkfs  ***" << endl << endl;
+        return false;
+    }
+
+    // Obtener el FileSystem montado para el id
+    for (FileSystem* fs: mountedFileSystems) {
+        if (fs->id == id) {
+            fs->createFile(path, size, cont, p);
+            cout << endl << " *** Archivo Creado*** " << endl << endl;
+            return true;
+        }
+    }
+
+
+    return true;
+
+}
+
+bool Consola::mkdir(string comando) {
+
+    vector<string> v = getAtributtes(comando);
+    string id = "", path = "", p = "";
+
+    for (auto it: v) {
+        vector<string> s = split(it);
+
+        if (s.at(0).starts_with("id")) {
+            id = s.at(1);
+        }
+
+        if (s.at(0).starts_with("path")) {
+            path = s.at(1);
+        }
+
+        if (s.at(0) == "p") {
+            p = s.at(1);
+        }
+
+    }
+
+    if (id.empty() || path.empty()) {
+        cout << endl << " *** Parametros obligatorios: id, path *** " << endl << endl;
+        return false;
+    }
+
+
+    // Validar que la particion con el id este montada
+    bool isMounted = montaje.partitionIsMounted(id);
+    if (!isMounted) {
+        cout << " *** Error, La particion debe de estar montada *** " << endl << endl;
+        return false;
+    }
+
+    // Validar que existe el file system para el id
+    bool existsFS = existsIdFileSystem(id);
+    if (!existsFS) {
+        cout << endl << " *** Error, el id no cuenta con un sistema de archivos, utilice mkfs  ***" << endl << endl;
+        return false;
+    }
+
+    if (!path.ends_with("/")) {
+        path += "/";
+    }
+
+    // Obtener el FileSystem montado para el id
+    for (FileSystem* fs: mountedFileSystems) {
+        if (fs->id == id) {
+            fs->makeDirectory(path, p);
+            cout << endl << " *** Directorios creados *** " << endl << endl;
+            return true;
+        }
+    }
+
+
+    return true;
+}
 
 string Consola::toLowerCase(string text) {
     for_each(text.begin(), text.end(), [](char& c) {
@@ -702,6 +812,17 @@ bool Consola::validatePathOrActivateRAID(string diskPath) {
 
     return true;
 
+}
+
+bool Consola::existsIdFileSystem (string id) {
+
+    for (FileSystem* fs: mountedFileSystems) {
+        if (fs->id == id) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 #endif //FILESYSTEM_CONSOLA_H

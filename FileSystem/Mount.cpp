@@ -1,6 +1,7 @@
 #include "Mount.h"
 #include "Structs.h"
 #include <cstring>
+#include <vector>
 
 
 Mount::Mount() {}
@@ -130,4 +131,21 @@ void Mount::leerMontaje() {
         }
     }
     cout << endl;
+}
+
+bool Mount::partitionIsMounted(string id) {
+
+    for (int i = 0; i < 26; i++) {
+        for (int j = 0; j < 99; j++) {
+            if (discos[i].particiones[j].estado == 1) {
+                string letter(1, discos[i].letra);
+                string partitionId = "vd" + letter + to_string(discos[i].particiones[j].numero);
+                if (partitionId == id) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
 }
