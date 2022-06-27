@@ -55,6 +55,12 @@ build CMakeFiles/FileSystem.dir/main.cpp.o: CXX_COMPILER__FileSystem_Debug /home
   OBJECT_DIR = CMakeFiles/FileSystem.dir
   OBJECT_FILE_DIR = CMakeFiles/FileSystem.dir
 
+build CMakeFiles/FileSystem.dir/Mount.cpp.o: CXX_COMPILER__FileSystem_Debug /home/gtcaps/Desktop/Proyecto$ 2/FileSystem/Mount.cpp || cmake_object_order_depends_target_FileSystem
+  DEP_FILE = CMakeFiles/FileSystem.dir/Mount.cpp.o.d
+  FLAGS = -g -std=gnu++2a
+  OBJECT_DIR = CMakeFiles/FileSystem.dir
+  OBJECT_FILE_DIR = CMakeFiles/FileSystem.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target FileSystem
@@ -63,7 +69,7 @@ build CMakeFiles/FileSystem.dir/main.cpp.o: CXX_COMPILER__FileSystem_Debug /home
 #############################################
 # Link the executable FileSystem
 
-build FileSystem: CXX_EXECUTABLE_LINKER__FileSystem_Debug CMakeFiles/FileSystem.dir/main.cpp.o
+build FileSystem: CXX_EXECUTABLE_LINKER__FileSystem_Debug CMakeFiles/FileSystem.dir/main.cpp.o CMakeFiles/FileSystem.dir/Mount.cpp.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/FileSystem.dir
   POST_BUILD = :

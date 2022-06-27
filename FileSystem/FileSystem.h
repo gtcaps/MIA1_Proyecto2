@@ -18,6 +18,8 @@ public:
 
     void createFile(string path, int size, string cont, string p);
     void makeDirectory(string path, string p);
+    void syncronice(string path);
+    string syncroniceRecursive(Folder* folder, string ident);
 
     bool existFolderPath(string path, vector<Folder*> folders);
 
@@ -29,6 +31,75 @@ public:
 
 FileSystem::FileSystem() {
     this->root->name = "/";
+}
+
+void FileSystem::syncronice(string path) {
+    string code = syncroniceRecursive(root, "");
+    code = code.substr(0, code.length() - 1) + "\n";
+    //cout << code << endl;
+
+    // Crear el archivo json
+    size_t lastSlash = path.find_last_of('/');
+    string folderPath = path.substr(0, lastSlash);
+
+    ofstream reporte;
+    reporte.open(path, ios::out);
+
+    if (reporte.fail()) {
+        string comando1 = "sudo mkdir -p \"" + folderPath + "\"";
+        string comando2 = "sudo chmod -R 777 \"" + folderPath + "\"";
+        system(comando1.c_str());
+        system(comando2.c_str());
+    }
+    reporte.close();
+
+    ofstream rep(path);
+    rep << code;
+    rep.close();
+
+
+    cout << endl << " *** Correcto: Se genero el JSON - " << path << endl << endl;
+
+}
+
+string FileSystem::syncroniceRecursive(Folder* folder, string ident) {
+    string code = "";
+
+    if (folder == NULL) {
+        return "";
+    }
+
+    code += ident + "{" + "\n";
+    code += ident + "\"name\": \"" + folder->name + "\"," + "\n";
+
+    // Recorrer los archivos dentro de la carpeta
+    code += ident + "\"files\": [" + "\n";
+
+
+    for (File* file: folder->files) {
+        code +=  ident + "    {" + "\n";
+        code +=  ident + "        \"name\": \"" + file->name + "\"," + "\n";
+        code +=  ident + "        \"size\": " + to_string(file->size) + "," + "\n";
+        code +=  ident + "        \"content\": \"" + file->content + "\"" + "\n";
+        code +=  ident + "    },";
+    }
+    code = code.substr(0, code.length() - 1) + "\n";
+    code += ident + "],\n" ;
+
+
+    // Recorrer las carpetas hijas
+    code +=  ident + "\"folders\": [" + "\n";
+    for(Folder* f: folder->folders) {
+        code += syncroniceRecursive(f, ident + "    ");
+    }
+    code = code.substr(0, code.length() - 1) + "\n";
+    code +=  ident + "]" + "\n";
+
+    code +=  ident + "},";
+
+
+    return code;
+
 }
 
 void FileSystem::makeDirectory(string path, string p) {

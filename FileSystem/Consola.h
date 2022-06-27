@@ -38,6 +38,7 @@ private:
     bool mkfile(string comando);
     bool exec(string comando);
     bool mkdir(string comando);
+    bool syncronice(string comando);
     bool rep(string comando);
 
 
@@ -146,6 +147,11 @@ bool Consola::ejecutarComando(string comando) {
     // MKDIR ================
     if (lcomando.starts_with("mkdir")) {
         return mkdir(lcomando);
+    }
+
+    // SYNCRONICE
+    if (lcomando.starts_with("syncronice")) {
+        return syncronice(lcomando);
     }
 
     cout << "comando: invalido" << endl;
@@ -640,6 +646,55 @@ bool Consola::mkdir(string comando) {
         if (fs->id == id) {
             fs->makeDirectory(path, p);
             cout << endl << " *** Directorios creados *** " << endl << endl;
+            return true;
+        }
+    }
+
+
+    return true;
+}
+
+bool Consola::syncronice(string comando) {
+    vector<string> v = getAtributtes(comando);
+    string id = "", path = "";
+
+    for (auto it: v) {
+        vector<string> s = split(it);
+
+        if (s.at(0).starts_with("id")) {
+            id = s.at(1);
+        }
+
+        if (s.at(0).starts_with("path")) {
+            path = s.at(1);
+        }
+    }
+
+    if (id.empty() || path.empty()) {
+        cout << endl << " *** Parametros obligatorios: id, path *** " << endl << endl;
+        return false;
+    }
+
+
+    // Validar que la particion con el id este montada
+    bool isMounted = montaje.partitionIsMounted(id);
+    if (!isMounted) {
+        cout << " *** Error, La particion debe de estar montada *** " << endl << endl;
+        return false;
+    }
+
+    // Validar que existe el file system para el id
+    bool existsFS = existsIdFileSystem(id);
+    if (!existsFS) {
+        cout << endl << " *** Error, el id no cuenta con un sistema de archivos, utilice mkfs  ***" << endl << endl;
+        return false;
+    }
+
+
+    // Obtener el FileSystem montado para el id
+    for (FileSystem* fs: mountedFileSystems) {
+        if (fs->id == id) {
+            fs->syncronice(path);
             return true;
         }
     }
