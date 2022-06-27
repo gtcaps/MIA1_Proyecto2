@@ -21,6 +21,9 @@ public:
     void syncronice(string path);
     string syncroniceRecursive(Folder* folder, string ident);
 
+    void makeReport(string path, string name);
+    string TreeReport(Folder* folder, string father);
+
     bool existFolderPath(string path, vector<Folder*> folders);
 
 
@@ -31,6 +34,77 @@ public:
 
 FileSystem::FileSystem() {
     this->root->name = "/";
+}
+
+void FileSystem::makeReport(string path, string name) {
+    if (name != "tree") {
+        cout << endl << " *** Error, el reporte debe ser de name=tree" << endl << endl;
+        return ;
+    }
+
+    string code =  "digraph G { \nrankdir=\"TB\"; \n\n";
+    code += TreeReport(root, "") + "\n}";
+
+
+    // Crear el archivo dot y compilarlo
+    string pathDot = path.substr(0, path.size() - 4) + ".dot";
+    size_t lastSlash = path.find_last_of('/');
+    string folderPathOfImage = path.substr(0, lastSlash);
+    string imageExtension = path.substr(path.size() - 3);
+
+    ofstream reporte;
+    reporte.open(path, ios::out);
+
+    if (reporte.fail()) {
+        string comando1 = "sudo mkdir -p \"" + folderPathOfImage + "\"";
+        string comando2 = "sudo chmod -R 777 \"" + folderPathOfImage + "\"";
+        system(comando1.c_str());
+        system(comando2.c_str());
+    }
+    reporte.close();
+
+    ofstream rep(pathDot);
+    rep << code;
+    rep.close();
+
+
+    string comando2 = "dot -T" + imageExtension + " \"" + pathDot + "\" -o \"" + path + "\"";
+    system(comando2.c_str());
+
+    string comandoOpen = "xdg-open \"" + path + "\"";
+    system(comandoOpen.c_str());
+
+    cout << endl << " *** Correcto: Se genero el reporte tipo tree - " << pathDot << endl << endl;
+
+}
+
+string FileSystem::TreeReport(Folder *folder, string father) {
+    string code = "";
+
+    if (folder == NULL) {
+        return "";
+    }
+
+    //cout << ident << "| Folder: " << folder->name << endl;
+    string folderName = folder->name == "/" ? "root" : folder->name;
+    code += "node_" + father + "_" + folderName + "[style=filled fillcolor=\"#bbdd22\" shape=component label=\"" + folder->name + "\"];" + "\n";
+
+    // Recorrer los archivos dentro de la carpeta
+    int cont = 1;
+    for (File* file: folder->files) {
+        //cout << ident + "++++Archivo: " << file->name << endl;
+        code += "    node_" + father + "_" + folderName + to_string(cont) + "[shape=note label=\"" + file->name + "\"];" + "\n";
+        code += "    node_" + father + "_" + folderName + " -> " + "node_" + father + "_" + folderName + to_string(cont) + ";\n";
+        cont++;
+    }
+
+    // Recorrer las carpetas hijas
+    for(Folder* f: folder->folders) {
+        code += "node_" + father + "_" + folderName + " -> node_" + folderName + "_" + f->name + "\n";
+        code += TreeReport(f, folderName);
+    }
+
+    return code;
 }
 
 void FileSystem::syncronice(string path) {

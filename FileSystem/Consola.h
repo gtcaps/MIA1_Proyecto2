@@ -131,7 +131,7 @@ bool Consola::ejecutarComando(string comando) {
 
     // REP ================
     if (lcomando.starts_with("rep")) {
-        //return rep(lcomando);
+        return rep(lcomando);
     }
 
     // MKFS ================
@@ -418,42 +418,61 @@ bool Consola::unmount(string comando)   {
 
 }
 
-//bool Consola::rep(string comando)   {
-//
-//    vector<string> v = getAtributtes(comando);
-//    string name = "", path = "", id = "";
-//
-//    for (auto it: v) {
-//        vector<string> s = split(it);
-//
-//        if (s.at(0).starts_with("name")) {
-//            name = s.at(1);
-//        }
-//
-//        if (s.at(0).starts_with("path")) {
-//            path = s.at(1);
-//        }
-//
-//        if (s.at(0).starts_with("id")) {
-//            id = s.at(1);
-//        }
-//
-//    }
-//
-//    if (name.empty() || path.empty() || id.empty()) {
-//        cout << endl << " *** Parametros obligatorios: name, path, id *** " << endl << endl;
-//        return false;
-//    }
-//
-//
-//    Rep rep;
-//    rep.crearReporte(path, name, id, montaje);
-//
-//    return true;
-//
-//
-//}
-//
+bool Consola::rep(string comando)   {
+
+    vector<string> v = getAtributtes(comando);
+    string name = "", path = "", id = "";
+
+    for (auto it: v) {
+        vector<string> s = split(it);
+
+        if (s.at(0).starts_with("name")) {
+            name = s.at(1);
+        }
+
+        if (s.at(0).starts_with("path")) {
+            path = s.at(1);
+        }
+
+        if (s.at(0).starts_with("id")) {
+            id = s.at(1);
+        }
+
+    }
+
+    if (name.empty() || path.empty() || id.empty()) {
+        cout << endl << " *** Parametros obligatorios: name, path, id *** " << endl << endl;
+        return false;
+    }
+
+    // Validar que la particion con el id este montada
+    bool isMounted = montaje.partitionIsMounted(id);
+    if (!isMounted) {
+        cout << " *** Error, La particion debe de estar montada *** " << endl << endl;
+        return false;
+    }
+
+    // Validar que existe el file system para el id
+    bool existsFS = existsIdFileSystem(id);
+    if (!existsFS) {
+        cout << endl << " *** Error, el id no cuenta con un sistema de archivos, utilice mkfs  ***" << endl << endl;
+        return false;
+    }
+
+    // Obtener el FileSystem montado para el id
+    for (FileSystem* fs: mountedFileSystems) {
+        if (fs->id == id) {
+            fs->makeReport(path, name);
+            return true;
+        }
+    }
+
+
+    return true;
+
+
+}
+
 bool Consola::mkfs(string comando)   {
 
     vector<string> v = getAtributtes(comando);

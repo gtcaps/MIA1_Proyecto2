@@ -18,4 +18,5 @@ pause
 mkfile $id=>vda2 $path=>"/home/user/mia/fase1/fase1.txt" $size=>18175 @p
 pause
 
-syncronice @id=>vda2 @path=>"/home/archivos/json/o.json"
+/*syncronice @id=>vda2 @path=>"/home/archivos/json/o.json"*/
+rep $id=>vda2 $path=>"/home/archivos/reportes/tree.jpg" $name=>tree
