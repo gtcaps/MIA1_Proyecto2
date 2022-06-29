@@ -1,5 +1,7 @@
 # Fubox
 
+AWS Demo: http://201700312junio2022.s3-website-us-east-1.amazonaws.com/
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.0.3.
 
 ## Development server
