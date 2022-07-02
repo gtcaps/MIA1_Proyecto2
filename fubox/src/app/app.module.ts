@@ -13,6 +13,9 @@ import {MatTableModule} from '@angular/material/table';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatButtonModule} from '@angular/material/button';
 import {MatInputModule} from '@angular/material/input';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatTreeModule} from '@angular/material/tree';
+
 
 // Vistas
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
@@ -20,6 +23,12 @@ import { PruebaComponent } from './prueba/prueba.component';
 import { HomeComponent } from './home/home.component';
 import { RegistroComponent } from './registro/registro.component';
 import { LoginComponent } from './login/login.component';
+import { AdminComponent } from './admin/admin.component';
+import { UserComponent } from './user/user.component';
+import { PageAccessDeniedComponent } from './page-access-denied/page-access-denied.component';
+import { AdminBajaComponent } from './admin-baja/admin-baja.component';
+import { AdminCarpetaComponent } from './admin-carpeta/admin-carpeta.component';
+import { AdminMenuComponent } from './admin-menu/admin-menu.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +37,13 @@ import { LoginComponent } from './login/login.component';
     PruebaComponent,
     HomeComponent,
     RegistroComponent,
-    LoginComponent
+    LoginComponent,
+    AdminComponent,
+    UserComponent,
+    PageAccessDeniedComponent,
+    AdminBajaComponent,
+    AdminCarpetaComponent,
+    AdminMenuComponent
   ],
   imports: [
     BrowserModule,
@@ -39,7 +54,9 @@ import { LoginComponent } from './login/login.component';
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
-    MatInputModule
+    MatInputModule,
+    MatProgressSpinnerModule,
+    MatTreeModule
   ],
   providers: [],
   bootstrap: [AppComponent]

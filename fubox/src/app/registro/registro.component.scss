@@ -12,6 +12,21 @@
     color: #4c549c;
   }
 
+  .backLink {
+    color: #4c9c71;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .sesionLink {
+    color: #4c549c;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
   .errorMessage {
     box-sizing: border-box;
     background-color: rgb(249, 52, 52);
